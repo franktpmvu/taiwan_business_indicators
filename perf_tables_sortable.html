@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>績效指標總表（可排序）</title>
+<style>
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;margin:24px;}
+h1{margin:0 0 12px 0;font-size:20px;}
+p{margin:0 0 16px 0;color:#333;}
+table{border-collapse:collapse;width:100%;font-size:14px;}
+th,td{border:1px solid #ddd;padding:8px;white-space:nowrap;}
+th{background:#f6f6f6;cursor:pointer;position:sticky;top:0;z-index:1;}
+tr:nth-child(even){background:#fafafa;}
+th.sort-asc::after{content:" ▲";font-size:12px;color:#555;}
+th.sort-desc::after{content:" ▼";font-size:12px;color:#555;}
+.caption{font-size:12px;color:#666;margin-top:10px;}
+</style>
+</head>
+<body>
+<h1>組合績效指標總表（2015 起，可點欄位排序）</h1>
+<p>點欄位標題可排序；再點一次切換升/降冪。排序會盡量用數值（% 會自動轉換）。</p>
+<div id="table-container"></div>
+<div class="caption">註：XIRR/TWRR/波動/MDD/CAGR_like 以百分比顯示；其餘為比率或金額。</div>
+
+<script>
+const data = [{"組合(0050/00631L/2330)": "純0050 (1/0/0)", "版本": "DCA", "總投入": "1,340,000.00", "最終淨值": "5,451,899.32", "獲利": "4,111,899.32", "MOIC": "4.07", "XIRR": "23.68%", "TWRR": "18.84%", "年化波動": "18.02%", "Sharpe": "1.05", "Sortino": "1.65", "MDD": "-24.26%", "Calmar": "0.78", "CAGR_like": "13.49%"}, {"組合(0050/00631L/2330)": "純0050 (1/0/0)", "版本": "策略", "總投入": "1,340,000.00", "最終淨值": "5,346,867.06", "獲利": "4,006,867.06", "MOIC": "3.99", "XIRR": "23.37%", "TWRR": "18.39%", "年化波動": "17.25%", "Sharpe": "1.07", "Sortino": "1.70", "MDD": "-21.55%", "Calmar": "0.85", "CAGR_like": "13.30%"}, {"組合(0050/00631L/2330)": "80/20/0", "版本": "DCA", "總投入": "1,340,000.00", "最終淨值": "7,372,296.83", "獲利": "6,032,296.83", "MOIC": "5.50", "XIRR": "28.61%", "TWRR": "23.02%", "年化波動": "22.34%", "Sharpe": "1.05", "Sortino": "1.62", "MDD": "-31.62%", "Calmar": "0.73", "CAGR_like": "16.63%"}, {"組合(0050/00631L/2330)": "80/20/0", "版本": "策略", "總投入": "1,340,000.00", "最終淨值": "7,210,174.16", "獲利": "5,870,174.16", "MOIC": "5.38", "XIRR": "28.25%", "TWRR": "22.49%", "年化波動": "21.49%", "Sharpe": "1.06", "Sortino": "1.67", "MDD": "-29.09%", "Calmar": "0.77", "CAGR_like": "16.39%"}, {"組合(0050/00631L/2330)": "80/0/20", "版本": "DCA", "總投入": "1,340,000.00", "最終淨值": "6,467,929.31", "獲利": "5,127,929.31", "MOIC": "4.83", "XIRR": "26.47%", "TWRR": "21.73%", "年化波動": "19.70%", "Sharpe": "1.10", "Sortino": "1.77", "MDD": "-26.48%", "Calmar": "0.82", "CAGR_like": "15.26%"}, {"組合(0050/00631L/2330)": "80/0/20", "版本": "策略", "總投入": "1,340,000.00", "最終淨值": "6,326,747.29", "獲利": "4,986,747.29", "MOIC": "4.72", "XIRR": "26.11%", "TWRR": "21.22%", "年化波動": "18.90%", "Sharpe": "1.12", "Sortino": "1.83", "MDD": "-23.91%", "Calmar": "0.89", "CAGR_like": "15.03%"}, {"組合(0050/00631L/2330)": "80/10/10", "版本": "DCA", "總投入": "1,340,000.00", "最終淨值": "6,920,113.09", "獲利": "5,580,113.09", "MOIC": "5.16", "XIRR": "27.58%", "TWRR": "22.40%", "年化波動": "20.95%", "Sharpe": "1.08", "Sortino": "1.70", "MDD": "-29.19%", "Calmar": "0.77", "CAGR_like": "15.96%"}, {"組合(0050/00631L/2330)": "80/10/10", "版本": "策略", "總投入": "1,340,000.00", "最終淨值": "6,768,460.81", "獲利": "5,428,460.81", "MOIC": "5.05", "XIRR": "27.22%", "TWRR": "21.89%", "年化波動": "20.13%", "Sharpe": "1.09", "Sortino": "1.75", "MDD": "-26.64%", "Calmar": "0.82", "CAGR_like": "15.73%"}, {"組合(0050/00631L/2330)": "50/25/25", "版本": "DCA", "總投入": "1,340,000.00", "最終淨值": "9,122,433.83", "獲利": "7,782,433.83", "MOIC": "6.81", "XIRR": "32.10%", "TWRR": "26.72%", "年化波動": "24.56%", "Sharpe": "1.09", "Sortino": "1.75", "MDD": "-34.38%", "Calmar": "0.78", "CAGR_like": "18.89%"}, {"組合(0050/00631L/2330)": "50/25/25", "版本": "策略", "總投入": "1,340,000.00", "最終淨值": "8,900,851.48", "獲利": "7,560,851.48", "MOIC": "6.64", "XIRR": "31.69%", "TWRR": "26.14%", "年化波動": "23.68%", "Sharpe": "1.11", "Sortino": "1.79", "MDD": "-32.03%", "Calmar": "0.82", "CAGR_like": "18.63%"}, {"組合(0050/00631L/2330)": "50/0/50", "版本": "DCA", "總投入": "1,340,000.00", "最終淨值": "7,991,974.38", "獲利": "6,651,974.38", "MOIC": "5.96", "XIRR": "29.93%", "TWRR": "25.45%", "年化波動": "22.30%", "Sharpe": "1.13", "Sortino": "1.93", "MDD": "-30.33%", "Calmar": "0.84", "CAGR_like": "17.48%"}, {"組合(0050/00631L/2330)": "50/0/50", "版本": "策略", "總投入": "1,340,000.00", "最終淨值": "7,796,567.74", "獲利": "6,456,567.74", "MOIC": "5.82", "XIRR": "29.53%", "TWRR": "24.89%", "年化波動": "21.45%", "Sharpe": "1.15", "Sortino": "1.98", "MDD": "-27.95%", "Calmar": "0.89", "CAGR_like": "17.22%"}, {"組合(0050/00631L/2330)": "50/50/0", "版本": "DCA", "總投入": "1,340,000.00", "最終淨值": "10,252,893.36", "獲利": "8,912,893.36", "MOIC": "7.65", "XIRR": "34.01%", "TWRR": "27.75%", "年化波動": "27.45%", "Sharpe": "1.04", "Sortino": "1.61", "MDD": "-38.61%", "Calmar": "0.72", "CAGR_like": "20.15%"}, {"組合(0050/00631L/2330)": "50/50/0", "版本": "策略", "總投入": "1,340,000.00", "最終淨值": "10,005,135.38", "獲利": "8,665,135.38", "MOIC": "7.47", "XIRR": "33.61%", "TWRR": "27.14%", "年化波動": "26.53%", "Sharpe": "1.04", "Sortino": "1.65", "MDD": "-36.31%", "Calmar": "0.75", "CAGR_like": "19.88%"}];
+const columns = ["組合(0050/00631L/2330)", "版本", "總投入", "最終淨值", "獲利", "MOIC", "XIRR", "TWRR", "年化波動", "Sharpe", "Sortino", "MDD", "Calmar", "CAGR_like"];
+
+function parseCell(txt){
+  const t = (txt ?? "").toString().trim();
+  if(t === "") return NaN;
+  if(t.endsWith("%")){
+    const v = parseFloat(t.replaceAll(",","").slice(0,-1));
+    return isNaN(v) ? NaN : v/100.0;
+  }
+  const v = parseFloat(t.replaceAll(",",""));
+  if(!isNaN(v)) return v;
+  return t.toLowerCase();
+}
+
+function buildTable(){
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const trh = document.createElement("tr");
+  columns.forEach(c => {
+    const th = document.createElement("th");
+    th.textContent = c;
+    th.addEventListener("click", () => sortBy(c, th));
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    columns.forEach(c => {
+      const td = document.createElement("td");
+      td.textContent = row[c];
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  return table;
+}
+
+let currentSort = {col:null, dir:1};
+
+function sortBy(col, th){
+  document.querySelectorAll("th").forEach(h => h.classList.remove("sort-asc","sort-desc"));
+  if(currentSort.col === col){ currentSort.dir *= -1; }
+  else { currentSort.col = col; currentSort.dir = 1; }
+  th.classList.add(currentSort.dir === 1 ? "sort-asc" : "sort-desc");
+
+  data.sort((a,b) => {
+    const av = parseCell(a[col]);
+    const bv = parseCell(b[col]);
+    const aNan = Number.isNaN(av), bNan = Number.isNaN(bv);
+    if(aNan && bNan) return 0;
+    if(aNan) return 1;
+    if(bNan) return -1;
+
+    if(typeof av === "string" && typeof bv === "string"){
+      return av.localeCompare(bv) * currentSort.dir;
+    }
+    if(av < bv) return -1 * currentSort.dir;
+    if(av > bv) return  1 * currentSort.dir;
+    return 0;
+  });
+
+  const container = document.getElementById("table-container");
+  container.innerHTML = "";
+  container.appendChild(buildTable());
+}
+
+document.getElementById("table-container").appendChild(buildTable());
+</script>
+</body>
+</html>
